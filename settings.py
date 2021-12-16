@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+from django.contrib.messages import constants as messages
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +27,7 @@ SECRET_KEY = 'django-insecure-^*128mbet+ryv8j4)-yh_qnd&jolohte8joz!yq5=)q*10xlf^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [34.136.69.130]
+ALLOWED_HOSTS = []
 
 
 
@@ -38,10 +40,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "nlp"
+    "nlp",
+    "accounts",
+    #'accounts.apps.AccountsConfig',
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+   
+    
    
     
 ]
+
+AUTH_USER_MODEL='accounts.CustomUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -66,6 +78,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+               
             ],
         },
     },
@@ -80,7 +93,7 @@ WSGI_APPLICATION = 'ai_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME':os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
@@ -107,9 +120,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "ja"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "Asia/Tokyo"
 
 USE_I18N = True
 
@@ -123,17 +136,28 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+MESSAGE_TAGS = {
+    messages.ERROR: 'alert alert-danger',
+    messages.WARNING: 'alert alert-warning',
+    messages.SUCCESS: 'alert alert-success',
+    messages.INFO: 'alert alert-info',
+}
+
 DATABASES={
-    "defalt":{
+    "default":{
         "ENGINE":"django.db.backends.postgresql_psycopg2",
-        "NAME":"cut_list",
-        "USER":os.environ.get("DB_USER"),
-        "PASSWORD":os.environ.get("DB_PASSWORD"),
+        "NAME":"ai_app",
+        "USER":"postgres",
+        "PASSWORD":"pos7464shin",
         "HOST":"",
         "PORT":"",
         
@@ -141,7 +165,7 @@ DATABASES={
 }
 
 #ロギング設定
-LOGGING＝{
+LOGGING={
     "version":1,#固定
     "disable_exsiting_loggers":False,
     
@@ -162,7 +186,7 @@ LOGGING＝{
     "handlers":{
         "console":{
             "level":"DEBUG",
-            "class":"logging.StreamHandler",
+            "class":"logging.StreamHandler",    
             "formatter":"dev"
         },
     },
@@ -178,3 +202,41 @@ LOGGING＝{
         },
     }
 }
+
+AUTH_USER_MODEL="accounts.CustomUser"
+
+#django-allauthで利用するdjango.contrib.siteを使うためにサイト識別用idを設定
+SITE_ID=1
+
+AUTHENTICATION_BACKENDS=(
+    "allauth.account.auth_backends.AuthenticationBackend",
+    #一般ユーザー用（メルアド認証)
+    "django.contrib.auth.backends.ModelBackend",
+    #管理サイト用(ユーザー名）
+)
+#メルアド認証に変更する設定
+ACCOUNT_AUTHENTICATION_METHOD="email"
+ACCOUNT_USERNAME_REQUIRED=False
+
+#サインアップにメルアド確認をはさむよう設定
+ACCOUNT_EMAIL_VERIFICATION="mandatory"#メール認証の場合"mandatory"
+ACCOUNT_EMAIL_REQUIRED=True
+
+
+#ログイン／ログアウト後の転移先を設定
+LOGIN_REDIRECT_URL="nlp:home"
+ACCOUNT_LOGOUT_REDIRECT_URL="account_login"
+
+#ログアウトリンクのクリック一発でログアウトする設定
+ACCOUNT_LOGOUT_ON_GET=True
+
+#django-allauthが送信するメールの件名に自動付与される接頭辞をブランクにする設定
+ACCOUNT_EMAIL_SUBJECT_PREFIX=""
+
+#デフォルトのメール送信元
+DEFALT_FROM_EMAIL="admin@example.com"
+
+# ユーザ登録時に確認メールを送信するか(none=送信しない, mandatory=送信する)
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_REQUIRED = True   # ユーザ登録にメルアド必須にする
+

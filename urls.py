@@ -15,10 +15,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from django.views.generic import TemplateView
+import sys
+sys.path.append('../')
+from nlp.views import index
+from nlp.views import tf_idf
+
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("",include("nlp.urls"))
+    path("",include("nlp.urls")),
+    path("accounts/",include("allauth.urls")),
+    path('accounts/', include('django.contrib.auth.urls')), 
+    path("nlp/",include("nlp.urls")),
+    path("nlp/templates/nlp/",index, name="home"),
+    path("nlp/templates/nlp/",tf_idf, name="tf_idf"),
     
     
     
