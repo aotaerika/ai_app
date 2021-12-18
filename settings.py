@@ -24,10 +24,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-^*128mbet+ryv8j4)-yh_qnd&jolohte8joz!yq5=)q*10xlf^'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# SECURITY WARNING: don't run with debug turned on in production!デバックモードを有効にするかどうか
+DEBUG = False
+# 許可するホスト名リスト
+ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOST')]
 
-ALLOWED_HOSTS = ["34.136.69.130"]
+#静的ファイルを設置する場所
+STATIC_ROOT='/usr/share/nginx/html/static'
+MEDIA_ROOT='/usr/share/nginx/html/media'
+
+#Amazon SES関連設定
+AWS_SES_ACCESS_KEY_ID=os.environ.get("AWS_SES_ACCESS_KEY_ID")
+AWS_SES_SECRET_ACCESS_KEY=os.environ.get("AWS_SES_SECRET_ACCESS_KEY")
+EMAIL_BACKEND="django_ses.SESBackend"
 
 
 
@@ -47,6 +56,8 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    
+    "django_ses",
    
     
    
@@ -173,26 +184,30 @@ LOGGING={
     "loggers":{
         #Djangoが利用するロガー
         "django":{
-            "handlers":["console"],
+            "handlers":["file"],
             "level":"INFO",
         },
         #アプリケーションが利用するロガー
         "nlp":{
-            "handlers":["console"],
-            "level":"DEBUG",
+            "handlers":["file"],
+            "level":"INFO",
         },
     },
     #ハンドラの設定
     "handlers":{
-        "console":{
-            "level":"DEBUG",
-            "class":"logging.StreamHandler",    
-            "formatter":"dev"
+        "file":{
+            "level":"INFO",
+            "class":"logging.handlers.TimedRotatingFileHandler",    
+            "filename":os.path.join(BASE_DIR,"Logs/django.log"),
+            "formatter":"prod",
+            "when":"D",#ログローテーション（新しいファイルへの切り替え）間隔単位、日
+            "interval":1,#ログローテーション間隔1日単位
+            "backupCount":7,#保存しておくログファイル数
         },
     },
     #フォーマッタの設定
     "formatters":{
-        "dev":{
+        "pord":{
             "format":"\t".join([
                 "%(asctime)s",
                 "[%(levelname)s]",
