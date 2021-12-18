@@ -184,18 +184,18 @@ LOGGING={
     "loggers":{
         #Djangoが利用するロガー
         "django":{
-            "handlers":["file"],
+            "handlers":["console"],
             "level":"INFO",
         },
         #アプリケーションが利用するロガー
         "nlp":{
-            "handlers":["file"],
+            "handlers":["console"],
             "level":"INFO",
         },
     },
     #ハンドラの設定
     "handlers":{
-        "file":{
+        "console":{
             "level":"INFO",
             "class":"logging.handlers.TimedRotatingFileHandler",    
             "filename":os.path.join(BASE_DIR,"Logs/django.log"),
